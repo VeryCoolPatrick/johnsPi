@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <style>
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Login</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul>
+            {% for category, message in messages %}
+                <li class = "{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+    <div id = "error-message" class = "error-message"></div>
+    <form method = "POST" id = "login-form">
+        <label for = "username">Username:</label>
+        <input type = "text" id = "username" name = "username" required><br>
+        <label for = "password">Password:</label>
+        <input type = "password" id = "password" name = "password" required><br>
+        <button type = "submit">Login</button>
+    </form>
+
+    <script>
+        document.getElementById("login-form").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Send a POST request to the server to log in
+            const formData = new FormData(this);
+            const response = await fetch("/login", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (response.ok) {
+                // If the response status is OK, parse the JSON response
+                const data = await response.json();
+
+                // Store the token in local storage
+                localStorage.setItem("token", data.token);
+
+                // Redirect to the "index" page after a short delay (e.g., 2 seconds)
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 2000); // Adjust the delay as needed
+
+            } else {
+                // Handle login failure
+                // Reset the form
+                this.reset();
+
+                // Display an error message
+                const errorMessageElement = document.getElementById("error-message");
+                errorMessageElement.textContent = "Login failed. Please check your credentials.";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -12,7 +12,7 @@ users = {
 }
 
 # Generate a JWT token for a user
-def generate_token(username):
+def generateToken(username):
     payload = {"username": username}
     token = jwt.encode(payload, flaskApp.secret_key, algorithm = "HS256")
     return token
@@ -58,7 +58,7 @@ def login():
     password = request.form["password"]
 
     if userName in users and users[userName] == password:
-        token = generate_token(userName)
+        token = generateToken(userName)
         response = make_response(jsonify({"token": token}))
         response.set_cookie("token", token)
         return response

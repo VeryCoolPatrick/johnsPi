@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, make_response
+from flask import Flask, render_template, request, redirect, url_for, jsonify, make_response
 from functools import wraps
 import secrets
 import jwt
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 flaskApp = Flask(__name__)
 flaskApp.secret_key = secrets.token_hex(16)
@@ -10,6 +10,11 @@ flaskApp.secret_key = secrets.token_hex(16)
 users = {
     "admin": "password"
 }
+
+# Set up GPIO mode
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(2, GPIO.OUT)
+GPIO.setup(3, GPIO.OUT)
 
 # Generate a JWT token for a user
 def generateToken(username):
@@ -70,6 +75,7 @@ def login():
 @tokenRequired
 def toggle(buttonNo):
     print(f"button pressed: {buttonNo}")
+    GPIO.output(int(buttonNo), not GPIO.input(int(buttonNo)))
     return redirect(url_for("index"))
 
 if __name__ == "__main__":
